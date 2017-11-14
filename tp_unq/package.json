@@ -1,0 +1,24 @@
+{
+  "name": "cities",
+  "version": "1.0.0",
+  "description": "A Rest API for querying data about cities",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm run server",
+    "server": "nodemon --inspect=0.0.0.0:5858 src/server.js",
+    "lint": "eslint src/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3",
+    "node-googleplaces": "^0.1.2",
+    "request": "^2.81.0",
+    "serve-index": "^1.9.0",
+    "twitter": "^1.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "nodemon": "^1.12.1"
+  }
+}
