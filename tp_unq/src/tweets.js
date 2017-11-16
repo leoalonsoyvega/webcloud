@@ -19,19 +19,14 @@ Obtener user credentials:
 
 const client = new Twitter(config.auth.twitter);
 
-function followers_count(user){
-  return user['followers_count'];
-};
-
-function max_followers(array){
-  return array.reduce(function (prev,curr) {
-      return followers_count(prev) > followers_count(curr) ? prev : curr;
-  });
+function followers_count(data){
+  return data.user.followers_count;
 };
 
 function user_max_followers(array){
-  let users = array.map(x => x.user);
-  return max_followers(users);
+  return array.reduce(function (prev,curr) {
+      return followers_count(prev) > followers_count(curr) ? prev : curr;
+  });
 };
 
 function mk_tweets_user(response){
@@ -47,28 +42,16 @@ function tweets(req, res) {
     count: 10,
   };
   
-  /*client.get('search/tweets', params).then(
-    (response) => {
-      let user = user_max_followers(response.statuses);
-      
-      // res.json(mk_ok_response(response.statuses));
-    }
-  ).catch((error) => res.json(
-    res.json(mk_error_response(error)))
-  );*/
- 
- // 2 line
   client.get('search/tweets', params).then(
-    (response) => user_max_followers(response.statuses)
+    (response) => 
+      user_max_followers(response.statuses)
 ).then(
     (response) => 
       client.get('statuses/user_timeline', { screen_name: response.screen_name, count: 2})
 ).then(
-    (response) =>
-    mk_tweets_user(response)
-).then(
     (response) =>{
-      res.json(mk_ok_response(response))}
+      let data_response = mk_tweets_user(response);
+      res.json(mk_ok_response(data_response))}
 ).catch(
     (error) => res.json(
       res.json(mk_error_response(error)))
@@ -77,5 +60,3 @@ function tweets(req, res) {
 };
 
 module.exports = tweets;
-
-
