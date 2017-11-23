@@ -44,10 +44,10 @@ function tweets(req, res) {
   
   client.get('search/tweets', params).then(
     (response) => 
-      user_max_followers(response.statuses)
+     user_max_followers(response.statuses)
 ).then(
     (response) => 
-      client.get('statuses/user_timeline', { screen_name: response.screen_name, count: 2})
+     client.get('statuses/user_timeline', { screen_name: response.user.screen_name, count: 2})
 ).then(
     (response) =>{
       let data_response = mk_tweets_user(response);
