@@ -1,6 +1,11 @@
 const Twitter = require('twitter');
 const config = require('./config');
+const promisify = require('util').promisify;
 const { mk_error_response, mk_ok_response } = require('./utils');
+const key_yandex = 'trnsl.1.1.20171123T231407Z.07bdcf1e0513b995.166154da9d6b0d02de2c8ab55a13f7c287629271';
+const yandex = require('yandex-translate')(key_yandex);
+const translate = promisify(yandex.translate);
+
 /*
 library doc - https://www.npmjs.com/package/twitter
 twitter API doc - https://developer.twitter.com/en/docs/api-reference-index
@@ -30,8 +35,22 @@ function user_max_followers(array){
 };
 
 function mk_tweets_user(response){
-  return response.map(x => ({text: x.text, author: x.user.screen_name}))
+  return response.map(x => ({text: x.text, author: x.user.screen_name, lang: x.lang}))
 };
+
+function mk_translator(data){
+  return translate(data.text,{to:'es'}).then(
+    (res) => {
+      return {
+      text_original: data.text,
+      text: res.text,
+      author: data.author,
+      lang: data.lang,}
+    }
+  )
+  
+};
+
 
 
 function tweets(req, res) {
@@ -49,9 +68,17 @@ function tweets(req, res) {
     (response) => 
      client.get('statuses/user_timeline', { screen_name: response.user.screen_name, count: 2})
 ).then(
-    (response) =>{
-      let data_response = mk_tweets_user(response);
-      res.json(mk_ok_response(data_response))}
+  (response) =>
+    mk_translator(response[0]).then(
+    (res1) =>
+    mk_translator(response[1]).then(
+      (res2) =>
+      [res1,res2]
+    )
+  )
+).then(
+  (response) =>{
+    res.json(mk_ok_response(response))}
 ).catch(
     (error) => res.json(
       res.json(mk_error_response(error)))
