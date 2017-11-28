@@ -44,7 +44,7 @@ function mk_translator(data){
       return {
       text_original: data.text,
       text: res.text,
-      author: data.author,
+      author: data.user.screen_name,
       lang: data.lang,}
     }
   )
