@@ -69,13 +69,7 @@ function tweets(req, res) {
      client.get('statuses/user_timeline', { screen_name: response.user.screen_name, count: 2})
 ).then(
   (response) =>
-    mk_translator(response[0]).then(
-    (res1) =>
-    mk_translator(response[1]).then(
-      (res2) =>
-      [res1,res2]
-    )
-  )
+     Promise.all(response.map(x => mk_translator(x)))
 ).then(
   (response) =>{
     res.json(mk_ok_response(response))}
